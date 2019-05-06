@@ -587,6 +587,7 @@ public:
     AP_Follow follow;
 #endif
 
+    AP_TestLib test_lib;
 };
 
 extern const AP_Param::Info        var_info[];

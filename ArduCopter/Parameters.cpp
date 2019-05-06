@@ -986,6 +986,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
 #endif
 
+	AP_SUBGROUPINFO(test_lib, "TEST", 28, ParametersG2, AP_TestLib),
+
     AP_GROUPEND
 };
 
@@ -1013,6 +1015,7 @@ ParametersG2::ParametersG2(void)
 #if MODE_FOLLOW_ENABLED == ENABLED
     ,follow()
 #endif
+	,test_lib()
 {
     AP_Param::setup_object_defaults(this, var_info);
 }
