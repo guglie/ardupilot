@@ -841,13 +841,15 @@ void AC_PosControl::write_log()
     float accel_x, accel_y;
     lean_angles_to_accel(accel_x, accel_y);
 
-    DataFlash_Class::instance()->Log_Write("PSC", "TimeUS,TPX,TPY,PX,PY,TVX,TVY,VX,VY,TAX,TAY,AX,AY",
-                                           "smmmmnnnnoooo", "FBBBBBBBBBBBB", "Qffffffffffff",
+    DataFlash_Class::instance()->Log_Write("PSC", "TimeUS,TPX,TPY,TPZ,PX,PY,PZ,TVX,TVY,VX,VY,TAX,TAY,AX,AY",
+                                           "smmmmmmnnnnoooo", "FBBBBBBBBBBBBBB", "Qffffffffffffff",
                                            AP_HAL::micros64(),
                                            (double)pos_target.x,
                                            (double)pos_target.y,
+										   (double)pos_target.z,
                                            (double)position.x,
                                            (double)position.y,
+										   (double)position.z,
                                            (double)vel_target.x,
                                            (double)vel_target.y,
                                            (double)velocity.x,
