@@ -35,6 +35,10 @@
 #define timing_printf(fmt, args...)
 #endif
 
+#ifndef HAL_DEFAULT_INS_FAST_SAMPLE
+#define HAL_DEFAULT_INS_FAST_SAMPLE 0
+#endif
+
 extern const AP_HAL::HAL& hal;
 
 #if APM_BUILD_TYPE(APM_BUILD_ArduCopter)
@@ -262,7 +266,7 @@ const AP_Param::GroupInfo AP_InertialSensor::var_info[] = {
     // @DisplayName: Gyro filter cutoff frequency
     // @Description: Filter cutoff frequency for gyroscopes. This can be set to a lower value to try to cope with very high vibration levels in aircraft. This option takes effect on the next reboot. A value of zero means no filtering (not recommended!)
     // @Units: Hz
-    // @Range: 0 127
+    // @Range: 0 256
     // @User: Advanced
     AP_GROUPINFO("GYRO_FILTER", 18, AP_InertialSensor, _gyro_filter_cutoff,  DEFAULT_GYRO_FILTER),
 
@@ -270,7 +274,7 @@ const AP_Param::GroupInfo AP_InertialSensor::var_info[] = {
     // @DisplayName: Accel filter cutoff frequency
     // @Description: Filter cutoff frequency for accelerometers. This can be set to a lower value to try to cope with very high vibration levels in aircraft. This option takes effect on the next reboot. A value of zero means no filtering (not recommended!)
     // @Units: Hz
-    // @Range: 0 127
+    // @Range: 0 256
     // @User: Advanced
     AP_GROUPINFO("ACCEL_FILTER", 19, AP_InertialSensor, _accel_filter_cutoff,  DEFAULT_ACCEL_FILTER),
 
@@ -428,11 +432,15 @@ const AP_Param::GroupInfo AP_InertialSensor::var_info[] = {
     // @User: Advanced
     // @Values: 1:FirstIMUOnly,3:FirstAndSecondIMU
     // @Bitmask: 0:FirstIMU,1:SecondIMU,2:ThirdIMU
-    AP_GROUPINFO("FAST_SAMPLE",  36, AP_InertialSensor, _fast_sampling_mask,   0),
+    AP_GROUPINFO("FAST_SAMPLE",  36, AP_InertialSensor, _fast_sampling_mask,   HAL_DEFAULT_INS_FAST_SAMPLE),
 
     // @Group: NOTCH_
     // @Path: ../Filter/NotchFilter.cpp
-    AP_SUBGROUPINFO(_notch_filter, "NOTCH_",  37, AP_InertialSensor, NotchFilterVector3fParam),
+    AP_SUBGROUPINFO(_gyro_notch_filter_params, "NOTCH_",  37, AP_InertialSensor, NotchFilterParams),
+
+	// @Group: NOTCA_
+	// @Path: ../Filter/NotchFilter.cpp
+	AP_SUBGROUPINFO(_accel_notch_filter_params, "NOTCA_",  38, AP_InertialSensor, NotchFilterParams),
 
     // @Group: LOG_
     // @Path: ../AP_InertialSensor/BatchSampler.cpp
@@ -639,8 +647,6 @@ AP_InertialSensor::init(uint16_t sample_rate)
 
     _sample_period_usec = 1000*1000UL / _sample_rate;
 
-    _notch_filter.init(sample_rate);
-    
     // establish the baseline time between samples
     _delta_time = 0;
     _next_sample_usec = 0;
@@ -780,8 +786,9 @@ AP_InertialSensor::detect_backends(void)
     case AP_BoardConfig::PX4_BOARD_PIXRACER:
         // only do fast samplng on ICM-20608. The MPU9250 doesn't handle high rate well when it has a mag enabled
         _fast_sampling_mask.set_default(1);
-        ADD_BACKEND(AP_InertialSensor_Invensense::probe(*this, hal.spi->get_device(HAL_INS_ICM20608_NAME), ROTATION_ROLL_180_YAW_90));
-        ADD_BACKEND(AP_InertialSensor_Invensense::probe(*this, hal.spi->get_device(HAL_INS_MPU9250_NAME), ROTATION_ROLL_180_YAW_90));
+        //ADD_BACKEND(AP_InertialSensor_Invensense::probe(*this, hal.spi->get_device(HAL_INS_ICM20608_NAME), ROTATION_ROLL_180_YAW_90));
+        //ADD_BACKEND(AP_InertialSensor_Invensense::probe(*this, hal.spi->get_device(HAL_INS_MPU9250_NAME), ROTATION_ROLL_180_YAW_90));
+		ADD_BACKEND(AP_InertialSensor_BMI088::probe(*this, hal.spi->get_device("bmi088_a"), hal.spi->get_device("bmi088_g"), ROTATION_ROLL_180_YAW_90));
         break;
 
     case AP_BoardConfig::PX4_BOARD_PIXHAWK_PRO:
@@ -1359,9 +1366,6 @@ void AP_InertialSensor::update(void)
             }
         }
     }
-
-    // apply notch filter to primary gyro
-    _gyro[_primary_gyro] = _notch_filter.apply(_gyro[_primary_gyro]);
     
     _last_update_usec = AP_HAL::micros();
     
