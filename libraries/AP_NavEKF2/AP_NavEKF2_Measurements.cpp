@@ -450,9 +450,9 @@ bool NavEKF2_core::readDeltaVelocity(uint8_t ins_index, Vector3f &dVel, float &d
 void NavEKF2_core::readGpsData()
 {
     // check for new GPS data
-    // do not accept data at a faster rate than 14Hz to avoid overflowing the FIFO buffer
+    // do not accept data at a faster rate than 62.5Hz to avoid overflowing the FIFO buffer
     const AP_GPS &gps = AP::gps();
-    if (gps.last_message_time_ms() - lastTimeGpsReceived_ms > 70) {
+    if (gps.last_message_time_ms() - lastTimeGpsReceived_ms > 16) {
         if (gps.status() >= AP_GPS::GPS_OK_FIX_3D) {
             // report GPS fix status
             gpsCheckStatus.bad_fix = false;

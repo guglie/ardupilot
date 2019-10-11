@@ -66,7 +66,7 @@ bool NavEKF2_core::setup_core(NavEKF2 *_frontend, uint8_t _imu_index, uint8_t _c
         // maximum 260 msec delay at 100 Hz fusion rate
         imu_buffer_length = 26;
     }
-    if(!storedGPS.init(OBS_BUFFER_LENGTH)) {
+    if(!storedGPS.init(imu_buffer_length)) {
         return false;
     }
     if(!storedMag.init(OBS_BUFFER_LENGTH)) {

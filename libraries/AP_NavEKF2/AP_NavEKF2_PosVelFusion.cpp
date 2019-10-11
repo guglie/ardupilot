@@ -480,7 +480,7 @@ void NavEKF2_core::FuseVelPosNED()
             if (gpsPosAccuracy > 0.0f) {
                 R_OBS[3] = sq(constrain_float(gpsPosAccuracy, frontend->_gpsHorizPosNoise, 100.0f));
             } else {
-                R_OBS[3] = sq(constrain_float(frontend->_gpsHorizPosNoise, 0.1f, 10.0f)) + sq(posErr);
+                R_OBS[3] = sq(constrain_float(frontend->_gpsHorizPosNoise, 0.01f, 10.0f)) + sq(posErr);
             }
             R_OBS[4] = R_OBS[3];
             // For data integrity checks we use the same measurement variances as used to calculate the Kalman gains for all measurements except GPS horizontal velocity
@@ -937,7 +937,7 @@ void NavEKF2_core::selectHeightForFusion()
         if (gpsHgtAccuracy > 0.0f) {
             posDownObsNoise = sq(constrain_float(gpsHgtAccuracy, 1.5f * frontend->_gpsHorizPosNoise, 100.0f));
         } else {
-            posDownObsNoise = sq(constrain_float(1.5f * frontend->_gpsHorizPosNoise, 0.1f, 10.0f));
+            posDownObsNoise = sq(constrain_float(1.5f * frontend->_gpsHorizPosNoise, 0.01f, 10.0f));
         }
     } else if (baroDataToFuse && (activeHgtSource == HGT_SOURCE_BARO)) {
         // using Baro data
