@@ -16,6 +16,7 @@
 #include "AP_Beacon.h"
 #include "AP_Beacon_Backend.h"
 #include "AP_Beacon_Pozyx.h"
+#include "AP_Beacon_TDoA.h"
 #include "AP_Beacon_Marvelmind.h"
 #include "AP_Beacon_SITL.h"
 
@@ -97,6 +98,8 @@ void AP_Beacon::init(void)
         _driver = new AP_Beacon_Pozyx(*this, serial_manager);
     } else if (_type == AP_BeaconType_Marvelmind) {
         _driver = new AP_Beacon_Marvelmind(*this, serial_manager);
+    } else if (_type == AP_BeaconType_TDoA) {
+        _driver = new AP_Beacon_TDoA(*this, serial_manager);
     }
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     if (_type == AP_BeaconType_SITL) {
@@ -178,6 +181,10 @@ uint8_t AP_Beacon::count() const
         return 0;
     }
     return num_beacons;
+}
+
+float AP_Beacon::beacon_tdoa(uint8_t beacon_instance) const {
+	return _driver->get_tdoa(beacon_instance);
 }
 
 // return all beacon data

@@ -42,6 +42,7 @@ public:
         AP_BeaconType_None   = 0,
         AP_BeaconType_Pozyx  = 1,
         AP_BeaconType_Marvelmind = 2,
+        AP_BeaconType_TDoA = 3,
         AP_BeaconType_SITL   = 10
     };
 
@@ -76,6 +77,8 @@ public:
     uint8_t count() const;
 
     // methods to return beacon specific information
+
+    float beacon_tdoa(uint8_t beacon_instance) const;
 
     // return all beacon data
     bool get_beacon_data(uint8_t beacon_instance, struct BeaconState& state) const;

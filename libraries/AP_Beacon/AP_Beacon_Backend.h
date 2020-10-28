@@ -44,6 +44,7 @@ public:
     float get_beacon_origin_lat(void) const { return _frontend.origin_lat; }
     float get_beacon_origin_lon(void) const { return _frontend.origin_lon; }
     float get_beacon_origin_alt(void) const { return _frontend.origin_alt; }
+    double get_tdoa(uint8_t id) { return 0; }
 
 protected:
 
