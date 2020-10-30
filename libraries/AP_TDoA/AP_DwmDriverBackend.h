@@ -36,7 +36,6 @@
 
 
 
-
 extern const AP_HAL::HAL& hal;
 
 

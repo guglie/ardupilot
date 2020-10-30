@@ -120,6 +120,14 @@ public:
 class TDOA_EKF {
 private:
 
+	float x[N_SIZE];      // state vector
+	float P[N_SIZE * N_SIZE];  // The covariance matrix
+	float Q[N_SIZE * N_SIZE];  // process noise covariance matrix
+	float F[N_SIZE * N_SIZE];  // update matrix
+	float H[N_SIZE];      // extraction (column) vector
+	float K[N_SIZE];      // kalman gain vector
+	float I[N_SIZE * N_SIZE];  // identity matrix, initialize all to 0
+
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL //check device id only if not in SITL
 
 	arm_matrix_instance_f32 xm;// = {N, 1, (float *)x};

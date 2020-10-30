@@ -85,7 +85,7 @@ class AP_Tdoa3Tag {
     static AP_TdoaEngine engine_instance;
     static AP_TdoaEngine* engine;
 
-    TDOA_EKF ekf;
+    TDOA_EKF* ekf;
     bool thread_started;
 
   public:

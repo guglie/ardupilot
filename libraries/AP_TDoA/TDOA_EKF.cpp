@@ -28,7 +28,7 @@
 float TDOA_EKF::anchor_error_avg[ANCHOR_MAX_NUM] = {0.};
 
 
-TDOA_EKF::TDOA_EKF(float origin_altitude) {
+TDOA_EKF::TDOA_EKF(float origin_altitude) : x(), P(), Q(), F(), H(), K(), I() {
     if(TDOA_EKF_DEBUG) hal.console->printf(" \n TDOA_EKF.TDOA_EKF(): constructor \n");
 
     origin_alt = origin_altitude;
@@ -45,13 +45,6 @@ TDOA_EKF::TDOA_EKF(float origin_altitude) {
 	float* K = new float[N_SIZE] {0};      // kalman gain vector
 	float* I = new float[N_SIZE * N_SIZE] {0};  // identity matrix, initialize all to 0*/
 
-    static float x[N_SIZE] = {0};      // state vector
-	static float P[N_SIZE * N_SIZE] = {0};  // The covariance matrix
-	static float Q[N_SIZE * N_SIZE] = {0};  // process noise covariance matrix
-	static float F[N_SIZE * N_SIZE] = {0};  // update matrix
-	static float H[N_SIZE] = {0};      // extraction (column) vector
-	static float K[N_SIZE] = {0};      // kalman gain vector
-	static float I[N_SIZE * N_SIZE] = {0};  // identity matrix, initialize all to 0
 
     arm_mat_init_f32(&xm, N_SIZE, 1, (float *) x);
     arm_mat_init_f32(&Pm, N_SIZE, N_SIZE, (float *) P);

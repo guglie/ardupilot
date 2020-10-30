@@ -40,7 +40,7 @@ AP_Tdoa3Tag::AP_Tdoa3Tag() /*: ekf()*/ {
     _singleton = this;
 
     //ekf = TDOA_EKF(0);  //TODO check initial height
-    ekf = TDOA_EKF();
+    ekf = new TDOA_EKF();
 
     engine_instance = AP_TdoaEngine(AP_HAL::millis(), &noOp /*&sendTdoaToEstimatorCallback*/, TdoaEngineMatchingAlgorithmRandom);
     engine = &engine_instance;
@@ -72,7 +72,7 @@ bool AP_Tdoa3Tag::start_thread() {
 }
 
 void AP_Tdoa3Tag::pos_estimator_thread() {
-    ekf = TDOA_EKF();
+    //ekf = new TDOA_EKF();
 
     while (true) {
         pos_estimator_loop();
@@ -82,7 +82,7 @@ void AP_Tdoa3Tag::pos_estimator_thread() {
 void AP_Tdoa3Tag::pos_estimator_loop() {
     if(!thread_started) {
         thread_started = true;
-        ekf = TDOA_EKF();
+        //ekf = new TDOA_EKF();
     }
 
     // reduce update frequency
@@ -91,7 +91,7 @@ void AP_Tdoa3Tag::pos_estimator_loop() {
         return;
     }
 
-    Vector3f pos = ekf.getPosition();
+    Vector3f pos = ekf->getPosition();
 
     /*
     uint8_t sequence_of_last_seen = 0;
@@ -119,7 +119,7 @@ void AP_Tdoa3Tag::pos_estimator_loop() {
     //uint8_t activeAnchorsCount = storage->getListOfActiveAnchorIds(activeAnchors, 16, now);  // 10
 
     if(TDOA3TAG_DEBUG) hal.console->printf("\n AP_Tdoa3Tag pos %f %f %f - tdoas %ld  pkts %ld  enqueued %ld  EKFlastObTime %.3f  NeedReset %d  OutFiltLev %.1f\n",
-                        pos.x, pos.y, pos.z, engine->tdoa_enqueued, engine->packets_processed, engine->tdoa_enqueued, ekf.lastObservationTime, ekf.needReset, ekf.outlierFilter.acceptanceLevel);
+                        pos.x, pos.y, pos.z, engine->tdoa_enqueued, engine->packets_processed, engine->tdoa_enqueued, ekf->lastObservationTime, ekf->needReset, ekf->outlierFilter.acceptanceLevel);
 
     if (engine->tdoaQueue.available() > 0) {
         tdoaMeasurement_t tdoa;
@@ -129,10 +129,10 @@ void AP_Tdoa3Tag::pos_estimator_loop() {
         /*Vector3f posA = Vector3f(tdoa.anchorPosition[0].x, tdoa.anchorPosition[0].y, tdoa.anchorPosition[0].z);
         Vector3f posB = Vector3f(tdoa.anchorPosition[1].x, tdoa.anchorPosition[1].y, tdoa.anchorPosition[1].z);
 
-        ekf.update(tdoa.systime_us, tdoa.distanceDiff*100, posA, posB, tdoa.stdDev, tdoa.idA, tdoa.idB);//*/
+        ekf->update(tdoa.systime_us, tdoa.distanceDiff*100, posA, posB, tdoa.stdDev, tdoa.idA, tdoa.idB);//*/
 
         if (TDOA3TAG_DEBUG && engine->tdoa_enqueued > 1000) {
-            ekf.test();
+            ekf->test();
         }
 
         if(TDOA3TAG_DEBUG) hal.console->printf("  --- tdoa %d %d  diff: %.2f   %lld \n", tdoa.idA, tdoa.idB, tdoa.distanceDiff, tdoa.systime_us);
