@@ -422,7 +422,18 @@ def build(bld):
     )
     ch_task.name = "ChibiOS_lib"
 
-    bld.env.LIB += ['ch']
+    if bld.env.MCU == "cortex-m4":
+        bld.env.LIB += ['ch', 'arm_cortexM4lf_math']
+        bld.env.C_FLAGS += ['-DARM_MATH_CM4']
+        bld.env.CXX_FLAGS += ['-DARM_MATH_CM4']
+    elif bld.env.MCU == "cortex-m7":
+        # note that building with cortex-m7 significantly increases the flash usage
+        bld.env.LIB += ['ch', 'arm_cortexM7lfsp_math']
+        bld.env.C_FLAGS += ['-DARM_MATH_CM7']
+        bld.env.CXX_FLAGS += ['-DARM_MATH_CM7']
+    else:
+        bld.env.LIB += ['ch']
+    
     bld.env.LIBPATH += ['modules/ChibiOS/']
     # list of functions that will be wrapped to move them out of libc into our
     # own code note that we also include functions that we deliberately don't
