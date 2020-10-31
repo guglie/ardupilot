@@ -30,14 +30,7 @@
 
 
 #if CONFIG_HAL_BOARD != HAL_BOARD_SITL
-
-#ifndef ARM_MATH_CM4
-	#define ARM_MATH_CM4
-#endif
-
 #include "arm_math.h"
-
-
 #endif
 
 
